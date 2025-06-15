@@ -9,7 +9,7 @@ class Categorie extends Model
 {
     use HasFactory;
     protected $fillable = ['nom'];
-    public function lieus()
+    public function lieux()
     {
         // Relation : Une catégorie peut avoir plusieurs lieux
         return $this->hasMany(Lieu::class);

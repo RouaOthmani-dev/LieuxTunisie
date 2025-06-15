@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use App\Models\Lieu;
 
@@ -13,6 +14,15 @@ class LieuSeeder extends Seeder
      */
     public function run(): void
     {
+      // Désactiver les contraintes de clé étrangère pour éviter les erreurs si la table a des relations
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        
+        // Vider la table et réinitialiser l'auto-increment
+        DB::table('lieus')->truncate();
+
+        // Réactiver les contraintes de clé étrangère
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
      $lieus = [
              [
         'nom' => 'Douz',
@@ -72,8 +82,17 @@ class LieuSeeder extends Seeder
     ],
      ];
 
-foreach($lieus as $lieu){
-    Lieu::create($lieu);
-}
-}
+ foreach($lieus as $lieu){
+            Lieu::create($lieu);
+        }
+
+
+        // 1. Tous les lieux à vedette = 0 (normalement déjà 0 par défaut, mais pour être sûr)
+        DB::table('lieus')->update(['vedette' => 0]);
+
+        // 2. Mettre certains lieux en vedette (par ID)
+        DB::table('lieus')
+            ->whereIn('id', [1, 2, 3, 4, 5, 6, 7]) // change les ID selon tes besoins
+            ->update(['vedette' => 1]);
+    }
 }

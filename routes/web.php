@@ -1,31 +1,55 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{
+    AccueilController,
+    BlogController,
+    ContactController,
+    ExpertController,
+    CategorieController,
+    DevisController,
+    Admin\LieuController,
+    LieuPublicController
+};
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+// Page d'accueil
+Route::get('/', [AccueilController::class, 'index'])->name('home');
 
-Route::get('/', function () {
-    return view('welcome');
+// Lieux (côté public)
+Route::get('/lieux/{id}', [LieuPublicController::class, 'show'])->name('lieux.show');
+
+// Blog
+Route::resource('blogs', BlogController::class);
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Contact
+Route::get('/contact', [ContactController::class, 'show'])->name('contact.show');
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+
+// Devis (visiteur)
+Route::get('/devis', [DevisController::class, 'create'])->name('devis.create');
+Route::post('/devis', [DevisController::class, 'store'])->name('devis.store');
+
+// Experts & Catégories
+Route::resource('experts', ExpertController::class);
+Route::resource('categories', CategorieController::class)->only(['index', 'show']);
+
+// Espace Admin (protégé par auth et is_admin)
+Route::middleware(['auth', 'is_admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function() {
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    Route::resource('lieux', LieuController::class);
+
+    Route::get('/devis', [DevisController::class, 'index'])->name('devis.index');
+    Route::get('/devis/{devis}', [DevisController::class, 'show'])->name('devis.show');
+    Route::delete('/devis/{devis}', [DevisController::class, 'destroy'])->name('devis.destroy');
 });
 
-Route::get('/dashboard', function () {
+// Dashboard utilisateur connecté
+Route::get('/dashboard', function() {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+})->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';

@@ -1,21 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Categorie;
 
-class ExpertController extends Controller
+class CategorieController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-    return Expert::first(); // car un seul expert
+        $categories = Categorie::all();
+        return view('categories.index', compact('categories'));
     }
 
-
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -30,6 +36,17 @@ class ExpertController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
+    {
+        $categorie = Categorie::findOrFail($id);
+         // Afficher les lieux appartenant à cette catégorie
+        $lieux = $categorie->lieux;
+        return view('categories.show', compact('categorie', 'lieux'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
     {
         //
     }
