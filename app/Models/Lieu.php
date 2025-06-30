@@ -15,10 +15,12 @@ class Lieu extends Model
         'description',
         'image',
         'region',
-        'adresse'
+        'adresse',
+        'latitude',
+        'longitude',
     ];
     public function categorie()
     {
-        return $this->belongsTo(categorie::class);
+        return $this->belongsTo(Categorie::class);
     }
 }

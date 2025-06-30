@@ -1,37 +1,37 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\Request;
 
-class BlogController extends Controller
+class AdminBlogController extends Controller
 {
-    // 1. Affiche la liste des articles
+    // Affiche la liste des articles
     public function index()
     {
-        $blogs = Blog::all(); // récupère tous les articles
-        return view('blog.index', compact('blogs')); // passe à la vue
+        $blogs = Blog::all();
+        return view('admin.blog.index', compact('blogs'));
     }
 
-    // 2. Formulaire de création
+    // Affiche le formulaire de création
     public function create()
     {
-        return view('blog.create');
+        return view('admin.blog.form', ['blog' => new Blog()]);
     }
 
-    // 3. Enregistre un nouvel article
+    // Enregistre un nouvel article
     public function store(Request $request)
     {
         $request->validate([
             'titre' => 'required',
             'contenu' => 'required',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
         ]);
 
         $imagePath = null;
-
-        if($request->hasFile('image')){
+        if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
         }
 
@@ -39,38 +39,31 @@ class BlogController extends Controller
             'titre' => $request->titre,
             'contenu' => $request->contenu,
             'image' => $imagePath,
+            'slug' => \Str::slug($request->titre),
         ]);
 
-        return redirect()->route('blogs.index')->with('success', 'Article ajouté !');
+        return redirect()->route('admin.blog.index')->with('success', 'Article ajouté !');
     }
 
-    // 4. Affiche un article via son slug
-    public function show($slug)
-{
-    $blog = Blog::where('slug', $slug)->firstOrFail();
-    return view('blog.show', compact('blog'));
-}
-
-
-    // 5. Formulaire d'édition
+    // Affiche le formulaire d'édition
     public function edit($id)
     {
         $blog = Blog::findOrFail($id);
-        return view('blog.edit', compact('blog'));
+        return view('admin.blog.form', compact('blog'));
     }
 
-    // 6. Mise à jour de l'article
+    // Met à jour l'article
     public function update(Request $request, $id)
     {
         $request->validate([
             'titre' => 'required',
             'contenu' => 'required',
-            'image' => 'nullable|image|max:2048'
+            'image' => 'nullable|image|max:2048',
         ]);
 
         $blog = Blog::findOrFail($id);
 
-        if($request->hasFile('image')){
+        if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
             $blog->image = $imagePath;
         }
@@ -80,15 +73,15 @@ class BlogController extends Controller
         $blog->slug = \Str::slug($request->titre);
         $blog->save();
 
-        return redirect()->route('blogs.index')->with('success', 'Article mis à jour !');
+        return redirect()->route('admin.blog.index')->with('success', 'Article mis à jour !');
     }
 
-    // 7. Supprime un article
+    // Supprime un article
     public function destroy($id)
     {
         $blog = Blog::findOrFail($id);
         $blog->delete();
 
-        return redirect()->route('blogs.index')->with('success', 'Article supprimé !');
+        return redirect()->route('admin.blog.index')->with('success', 'Article supprimé !');
     }
 }

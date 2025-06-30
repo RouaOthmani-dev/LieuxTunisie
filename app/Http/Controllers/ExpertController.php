@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Expert;
 
 class ExpertController extends Controller
 {
@@ -11,8 +12,8 @@ class ExpertController extends Controller
      */
     public function index()
     {
-        $experts=Expert::all();
-        return view('expert.index',compact('experts'));
+        $expert = Expert::first();
+        return view('experts.index', compact('expert'));
     }
 
     /**
@@ -36,6 +37,7 @@ class ExpertController extends Controller
             'films' => 'nullable|string',
             'imdb_link' => 'nullable|url',
         ]);
+
         Expert::create($validated);
 
         return redirect()->route('experts.index')->with('success', 'Expert ajouté avec succès.');
@@ -44,35 +46,46 @@ class ExpertController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Expert $expert)
     {
-        //
+        return view('experts.show', compact('expert'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Expert $expert)
     {
-        //
+        return view('admin.experts.edit', compact('expert'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+    public function update(Request $request, Expert $expert)
+{
+    $validated = $request->validate([
+        'nom' => 'required|string|max:255',
+        'titre' => 'required|string|max:255',
+        'photo' => 'nullable|string', // ou 'image' si upload
+        'experience' => 'nullable|string',
+        'films' => 'nullable|string',
+        'imdb_link' => 'nullable|url',
+    ]);
+
+    $expert->update($validated);
+
+    return redirect()->route('admin.dashboard')->with('success', 'Expert mis à jour avec succès.');
+}
+
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Expert $expert)
     {
-       $expert->delete();
+        $expert->delete();
 
         return redirect()->route('experts.index')->with('success', 'Expert supprimé avec succès.');
-    
     }
 }

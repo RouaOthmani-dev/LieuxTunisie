@@ -1,65 +1,77 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
-        @csrf
+@extends('layouts.guest')
 
-        <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Créer un compte</h2>
+@section('title', 'Inscription')
 
-        @php
-            // Fonction helper pour gérer la classe des inputs selon la présence d'erreurs
-            function inputClass($errors, $field) {
-                $base = "block mt-1 w-full rounded-md px-3 py-2 shadow-sm border focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400";
-                return $errors->has($field) ? $base . " border-red-500" : $base . " border-gray-300";
-            }
-        @endphp
+@push('styles')
+<style>
+    body {
+        background: linear-gradient(135deg, #D4A373 20%, #87CEEB 80%);
+        min-height: 100vh;
+    }
 
-        <!-- Nom complet -->
-        <div>
-            <label for="name" class="block text-gray-800 font-semibold mb-2">Nom complet <span class="text-red-500">*</span></label>
-            <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name"
-                class="{{ inputClass($errors, 'name') }}">
-            @error('name')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
+    .card-register {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        padding: 30px;
+    }
+
+    .form-floating > .form-control, 
+    .form-floating > .form-select {
+        border-radius: 10px;
+    }
+</style>
+@endpush
+
+@section('content')
+    <section class="py-5">
+        <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+            <div class="card-register col-md-8 col-lg-6">
+                <h2 class="text-center mb-4">Créer un compte</h2>
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                               id="name" name="name" placeholder="Nom" value="{{ old('name') }}" required autofocus>
+                        <label for="name">Nom</label>
+                        @error('name')
+                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                               id="email" name="email" placeholder="Adresse E-mail" value="{{ old('email') }}" required>
+                        <label for="email">Adresse E-mail</label>
+                        @error('email')
+                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                               id="password" name="password" placeholder="Mot de passe" required>
+                        <label for="password">Mot de passe</label>
+                        @error('password')
+                            <div class="text-danger mt-1 small">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" 
+                               id="password_confirmation" name="password_confirmation" placeholder="Confirmer le mot de passe" required>
+                        <label for="password_confirmation">Confirmer le mot de passe</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="rgpd" id="rjpd" required>
+                        <lable class="form-check-label" for="rjpd" >
+                            j'accepte la <a href="{{route('confidentialite')}}">politique de confidentialité. </a>
+                        <label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 rounded-pill shadow-sm">S'inscrire</button>
+                </form>
+            </div>
         </div>
-
-        <!-- Adresse e-mail -->
-        <div class="mt-4">
-            <label for="email" class="block text-gray-800 font-semibold mb-2">Adresse e-mail <span class="text-red-500">*</span></label>
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autocomplete="username"
-                class="{{ inputClass($errors, 'email') }}">
-            @error('email')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Mot de passe -->
-        <div class="mt-4">
-            <label for="password" class="block text-gray-800 font-semibold mb-2">Mot de passe <span class="text-red-500">*</span></label>
-            <input id="password" type="password" name="password" required autocomplete="new-password"
-                class="{{ inputClass($errors, 'password') }}">
-            @error('password')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <!-- Confirmer le mot de passe -->
-        <div class="mt-4">
-            <label for="password_confirmation" class="block text-gray-800 font-semibold mb-2">Confirmer le mot de passe <span class="text-red-500">*</span></label>
-            <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
-                class="{{ inputClass($errors, 'password_confirmation') }}">
-            @error('password_confirmation')
-                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-            @enderror
-        </div>
-
-        <div class="flex items-center justify-between mt-6">
-            <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-blue-600">
-                Déjà inscrit ? Connectez-vous
-            </a>
-
-            <button type="submit" class="ml-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded focus:ring-2 focus:ring-blue-500">
-                Créer un compte
-            </button>
-        </div>
-    </form>
-</x-guest-layout>
+    </section>
+@endsection

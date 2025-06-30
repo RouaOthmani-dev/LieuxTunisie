@@ -15,9 +15,10 @@ class AccueilController extends Controller
 {
         public function index()
     {
-        $lieux = Lieu::all();
-        $lieuxVedettes = Lieu::where('vedette', true)->take(6)->get();
+        $lieux = Lieu::with('categorie')->get(); // charge les catégories avec les lieux
+        $lieuxVedettes = Lieu::with('categorie')->where('vedette', true)->take(6)->get();
 
-        return view('accueil.index', compact('lieux', 'lieuxVedettes'));
+       return view('accueil.index', compact('lieux', 'lieuxVedettes'));
+
     }
 }
